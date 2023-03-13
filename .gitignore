@@ -1,0 +1,15 @@
+# env
+.env
+
+# node
+node_modules
+
+# ts
+build
+
+# yarn
+yarn.lock
+yarn-error.log
+
+# else
+.DS_Store

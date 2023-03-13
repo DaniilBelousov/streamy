@@ -1,0 +1,45 @@
+{
+  "name": "streamy",
+  "version": "1.0.0",
+  "description": "Streaming service",
+  "main": "build/app.js",
+  "author": "Daniel Belousov",
+  "license": "MIT",
+  "private": false,
+  "type": "module",
+  "dependencies": {
+    "@fastify/autoload": "^5.7.1",
+    "fastify": "^4.14.1",
+    "fastify-type-provider-zod": "^1.1.9",
+    "zod": "^3.21.4"
+  },
+  "scripts": {
+    "build": "rm -rf ./build && tsc -p tsconfig.json",
+    "build:watch": "yarn build -- --watch",
+    "start": "node ./build/app.js -- --watch",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.0",
+    "husky": ">=6",
+    "lint-staged": ">=10",
+    "prettier": "^2.8.4",
+    "typescript": "^4.9.5"
+  },
+  "lint-staged": {
+    "*.{js,css,md}": "prettier --write"
+  },
+  "prettier": {
+    "trailingComma": "all",
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true,
+    "bracketSpacing": true,
+    "bracketSameLine": false,
+    "arrowParens": "avoid",
+    "jsxSingleQuote": false,
+    "quoteProps": "as-needed",
+    "printWidth": 90,
+    "parser": "typescript"
+  }
+}
