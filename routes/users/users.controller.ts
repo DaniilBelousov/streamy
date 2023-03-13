@@ -11,6 +11,6 @@ export default async function (app: FastifyInstance) {
     handler: (req, res) => {
       res.statusCode = 200;
       res.send(req.query.name);
-    }
+    },
   });
 }

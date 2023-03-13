@@ -1,6 +1,10 @@
 import Fastify from 'fastify';
 import autoload from '@fastify/autoload';
-import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod';
+import {
+  serializerCompiler,
+  validatorCompiler,
+  ZodTypeProvider,
+} from 'fastify-type-provider-zod';
 import z from 'zod';
 
 import { fileURLToPath } from 'url';
@@ -11,8 +15,8 @@ const __dirname = dirname(filePath);
 
 const app = Fastify({
   logger: {
-    level: 'info'
-  }
+    level: 'info',
+  },
 });
 
 app.setValidatorCompiler(validatorCompiler);
@@ -23,20 +27,20 @@ app.withTypeProvider<ZodTypeProvider>().route({
   url: '/',
   schema: {
     querystring: z.object({
-      name: z.string().min(4)
+      name: z.string().min(4),
     }),
     response: {
-      200: z.string()
-    }
+      200: z.string(),
+    },
   },
   handler: (req, res) => {
     res.send(req.query.name);
-  }
+  },
 });
 
 app.register(autoload, {
   dir: join(__dirname, 'routes'),
-  dirNameRoutePrefix: false
+  dirNameRoutePrefix: false,
 });
 
 app.listen({ port: process.env.PORT || 3000 });

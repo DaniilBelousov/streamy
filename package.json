@@ -17,7 +17,8 @@
     "build": "rm -rf ./build && tsc -p tsconfig.json",
     "build:watch": "yarn build -- --watch",
     "start": "node ./build/app.js -- --watch",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "lint": "prettier --write ./"
   },
   "devDependencies": {
     "@types/node": "^18.15.0",
@@ -27,7 +28,7 @@
     "typescript": "^4.9.5"
   },
   "lint-staged": {
-    "*.{js,css,md}": "prettier --write"
+    "*.{js,css,md,ts}": "prettier --write"
   },
   "prettier": {
     "trailingComma": "all",
