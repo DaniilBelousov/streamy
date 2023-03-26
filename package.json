@@ -22,7 +22,8 @@
     "start": "node ./build/app.js",
     "build": "rm -rf ./build && tsc -p tsconfig.json",
     "build:watch": "yarn build -- --watch",
-    "start": "node ./build/app.js",
+    "docker:start": "docker compose pull && docker compose up --build -d",
+    "docker:stop": "docker stop streamy_db",
     "prepare": "husky install",
     "lint": "prettier --write ./"
   },
