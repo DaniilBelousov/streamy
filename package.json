@@ -14,9 +14,12 @@
     "fastify": "^4.14.1",
     "fastify-plugin": "^4.5.0",
     "fastify-type-provider-zod": "^1.1.9",
+    "knex": "^2.4.2",
+    "pg": "^8.10.0",
     "zod": "^3.21.4"
   },
   "scripts": {
+    "start": "node ./build/app.js",
     "build": "rm -rf ./build && tsc -p tsconfig.json",
     "build:watch": "yarn build -- --watch",
     "start": "node ./build/app.js",
@@ -28,6 +31,7 @@
     "husky": ">=6",
     "lint-staged": ">=10",
     "prettier": "^2.8.4",
+    "ts-node": "^10.9.1",
     "typescript": "^4.9.5"
   },
   "lint-staged": {
