@@ -25,7 +25,10 @@
     "docker:start": "docker compose pull && docker compose up --build -d",
     "docker:stop": "docker stop streamy_db",
     "prepare": "husky install",
-    "lint": "prettier --write ./"
+    "lint": "prettier --write ./",
+    "migrate:make": "knex migrate:make -x ts",
+    "migrate:latest": "knex migrate:latest",
+    "migrate:down": "knex migrate:down"
   },
   "devDependencies": {
     "@types/node": "^18.15.0",
