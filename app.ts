@@ -24,7 +24,7 @@ app.register(autoload, {
 app.register(autoload, {
   dir: join(__dirname, 'routes'),
   dirNameRoutePrefix: false,
-  ignorePattern: /.*schemas\.js/,
+  ignorePattern: /.*(schema|service)\.js/,
 });
 
 app.listen({ port: process.env.PORT || 3000 });
