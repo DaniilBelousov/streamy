@@ -4,23 +4,23 @@ import type { Knex } from 'knex';
 import { CommonModel } from './common.model.js';
 
 export const UserGuard = z.object({
-  id: z.string().uuid(),
   password: z.string(),
   email: z.string().email(),
   nickname: z.string(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
 });
 
-export type IUsers = z.infer<typeof UserGuard>;
+type UserData = z.infer<typeof UserGuard>;
 
-interface UserData {
+export interface IUser {
+  id: string;
   password: string;
   email: string;
   nickname: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export class Users extends CommonModel<IUsers, UserData, UserData> {
+export class Users extends CommonModel<IUser, UserData, UserData> {
   constructor(knex: Knex) {
     super(knex, 'users', UserGuard);
   }

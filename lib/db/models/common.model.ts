@@ -5,8 +5,8 @@ import type z from 'zod';
 
 class CommonModel<RData extends {}, CData, UData extends Partial<CData>> {
   public tableName: string;
-  private knex: Knex;
-  private guard: z.AnyZodObject;
+  protected knex: Knex;
+  protected guard: z.AnyZodObject;
 
   constructor(knex: Knex, tableName: string, guard: z.AnyZodObject) {
     this.knex = knex;
@@ -20,7 +20,7 @@ class CommonModel<RData extends {}, CData, UData extends Partial<CData>> {
     if (!isValid) throw new Error();
     const id = randomUUID();
     const model = this.knex(this.tableName);
-    await model.insert(data);
+    await model.insert({ id, ...data });
     return id;
   }
 

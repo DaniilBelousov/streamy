@@ -5,6 +5,8 @@ import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod
 import { fileURLToPath } from 'node:url';
 import { join, dirname } from 'node:path';
 
+import { jwtAuth } from './lib/hooks.js';
+
 const filePath = fileURLToPath(import.meta.url);
 const __dirname = dirname(filePath);
 
@@ -16,6 +18,8 @@ const app = Fastify({
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
+
+app.addHook('preParsing', jwtAuth);
 
 app.register(autoload, {
   dir: join(__dirname, 'plugins'),
