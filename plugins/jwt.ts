@@ -9,7 +9,7 @@ const jwtPlugin = async (app: FastifyInstance) => {
     secret: JWT_SECRET,
     cookie: {
       cookieName: 'token',
-      signed: false,
+      signed: true,
     },
   });
 };

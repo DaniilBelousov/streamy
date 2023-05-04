@@ -5,12 +5,12 @@ import type { FastifyInstance } from 'fastify';
 import type { UserType } from '@fastify/jwt';
 
 import { validatePassword, hashPassword } from '../../lib/utils.js';
+import { auth } from '../../lib/config.js';
 import type schemas from './auth.schema.js';
 import type { IUser } from '../../lib/db/index.js';
 
 type SignUpBody = z.infer<typeof schemas.signUp.body>;
 type SignInBody = z.infer<typeof schemas.signIn.body>;
-type RefreshBody = z.infer<typeof schemas.refresh.body>;
 
 interface AccessTokens {
   accessToken: string;
@@ -26,44 +26,40 @@ class Service {
 
   async signUp(data: SignUpBody): Promise<AccessTokens> {
     const {
-      models: { Users, AccessKeys },
+      models: { Users },
     } = this.app;
-    const { password, email } = data;
+
+    const { password, email, nickname } = data;
     const user = await Users.read().select('*').where({ email }).first();
     if (user) throw new Error('User already exists');
     const passwordHash = await hashPassword(password);
     const id = await Users.create({ ...data, password: passwordHash });
-    const tokens = this.issueTokens({ id, nickname: data.nickname });
-    const expiresAt = this.getExpirationDate();
-    await AccessKeys.create({ refreshToken: tokens.refreshToken, userId: id, expiresAt });
-    return tokens;
+
+    return this.renewTokens({ id, nickname });
   }
 
   async signIn({ password, email }: SignInBody): Promise<AccessTokens> {
     const {
-      models: { Users, AccessKeys },
+      models: { Users },
     } = this.app;
+
     const user = await Users.read().select('*').where({ email }).first();
     if (!user) throw new Error('User not found');
     const isValid = await validatePassword(password, user.password);
     if (!isValid) throw new Error('Invalid password');
-    const tokens = this.issueTokens(user);
-    const expiresAt = this.getExpirationDate();
-    await AccessKeys.create({
-      refreshToken: tokens.refreshToken,
-      userId: user.id,
-      expiresAt,
-    });
-    return tokens;
+    const { id, nickname } = user;
+
+    return this.renewTokens({ id, nickname });
   }
 
-  async refresh(data: RefreshBody) {
+  async refresh(refreshToken: string) {
     const {
       models: { AccessKeys, Users },
     } = this.app;
+
     const row = await AccessKeys.read()
       .select('*')
-      .where({ refreshToken: data.refreshToken })
+      .where({ refreshToken })
       .innerJoin<IUser>(
         'users',
         `${AccessKeys.tableName}.userId`,
@@ -72,22 +68,34 @@ class Service {
       .first();
     if (!row) throw Error('Unauthorized');
     const { id, nickname } = row;
-    const tokens = this.issueTokens({ id, nickname });
-    AccessKeys.delete(data.refreshToken);
-    return tokens;
+
+    return this.renewTokens({ id, nickname }, refreshToken);
   }
 
-  private issueTokens(user: UserType): AccessTokens {
-    const accessToken = this.app.jwt.sign(user);
+  private async renewTokens(
+    user: UserType,
+    oldRefreshToken?: string,
+  ): Promise<AccessTokens> {
+    const {
+      models: { AccessKeys },
+    } = this.app;
+
+    const { refreshExpirationMonths, tokenExpiresIn } = auth;
+    const accessToken = this.app.jwt.sign(user, { expiresIn: tokenExpiresIn });
     const refreshToken = randomUUID();
-    return { accessToken, refreshToken };
-  }
+    const expiresAt = new Date();
+    expiresAt.setMonth(expiresAt.getMonth() + refreshExpirationMonths);
 
-  private getExpirationDate(): Date {
-    const TOKEN_EXPIRATION_MONTHS = 6;
-    const date = new Date();
-    date.setMonth(date.getMonth() + TOKEN_EXPIRATION_MONTHS);
-    return date;
+    await Promise.all([
+      oldRefreshToken && AccessKeys.delete(oldRefreshToken),
+      AccessKeys.create({
+        refreshToken,
+        userId: user.id,
+        expiresAt,
+      }),
+    ]);
+
+    return { accessToken, refreshToken };
   }
 }
 

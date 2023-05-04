@@ -24,4 +24,10 @@ export class AccessKeys extends CommonModel<IAccessKeys, IAccessKeys, IAccessKey
     await model.insert(data);
     return data.refreshToken;
   }
+
+  override async delete(refreshToken: string) {
+    const model = this.knex(this.tableName);
+    await model.where({ refreshToken }).del();
+    return refreshToken;
+  }
 }

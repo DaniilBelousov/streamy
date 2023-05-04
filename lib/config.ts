@@ -27,4 +27,6 @@ export const hashConfig = {
 
 export const auth = {
   whitelist: ['/sign-up', '/sign-in', '/refresh'],
+  refreshExpirationMonths: 6,
+  tokenExpiresIn: '30m',
 };

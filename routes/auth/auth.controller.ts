@@ -15,9 +15,11 @@ export default async function (app: FastifyInstance) {
       const { accessToken, refreshToken } = await service.signUp(req.body);
       res.setCookie('token', accessToken, {
         path: '/',
+        signed: true,
       });
       res.setCookie('refreshToken', refreshToken, {
         path: '/',
+        signed: true,
       });
       res.statusCode = 201;
       res.send({ status: 'OK' });
@@ -32,9 +34,11 @@ export default async function (app: FastifyInstance) {
       const { accessToken, refreshToken } = await service.signIn(req.body);
       res.setCookie('token', accessToken, {
         path: '/',
+        signed: true,
       });
       res.setCookie('refreshToken', refreshToken, {
         path: '/',
+        signed: true,
       });
       res.statusCode = 201;
       res.send();
@@ -46,12 +50,18 @@ export default async function (app: FastifyInstance) {
     url: '/refresh',
     schema: schemas.refresh,
     handler: async (req, res) => {
-      const { accessToken, refreshToken } = await service.refresh(req.body);
+      const refreshToken = req.cookies['refreshToken'];
+      if (!refreshToken) throw new Error();
+      const { valid, value } = req.unsignCookie(refreshToken);
+      if (!valid || !value) throw new Error();
+      const { accessToken, refreshToken: newRefreshToken } = await service.refresh(value);
       res.setCookie('token', accessToken, {
         path: '/',
+        signed: true,
       });
-      res.setCookie('refreshToken', refreshToken, {
+      res.setCookie('refreshToken', newRefreshToken, {
         path: '/',
+        signed: true,
       });
       res.statusCode = 201;
       res.send();

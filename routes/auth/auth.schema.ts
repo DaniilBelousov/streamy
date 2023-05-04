@@ -29,9 +29,6 @@ export default {
     },
   },
   refresh: {
-    body: z.object({
-      refreshToken: z.string().uuid(),
-    }),
     response: {
       201: z.object({
         status: z.string(),
