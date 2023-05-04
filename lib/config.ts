@@ -18,3 +18,13 @@ export const db: DbConfig = {
     password: PSQL_DB_PASS,
   },
 };
+
+export const hashConfig = {
+  scryptParams: { N: 32768, r: 8, p: 1, maxmem: 64 * 1024 * 1024 },
+  saltLen: 32,
+  keyLen: 64,
+};
+
+export const auth = {
+  whitelist: ['/sign-up', '/sign-in', '/refresh'],
+};

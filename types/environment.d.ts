@@ -10,6 +10,8 @@ declare global {
       PSQL_DB_USER: string;
       PSQL_DB_PASS: string;
       APP_STAGE: 'dev';
+      JWT_SECRET: string;
+      COOKIE_SECRET: string;
     }
   }
 }
