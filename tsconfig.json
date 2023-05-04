@@ -29,5 +29,7 @@
     "noUnusedParameters": true,
     "importsNotUsedAsValues": "error",
     "checkJs": true
-  }
+  },
+  "include": ["./**/*.ts"],
+  "exclude": ["./knexfile.ts", "./**/migrations/*.ts"]
 }

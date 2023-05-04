@@ -3,7 +3,7 @@ import fp from 'fastify-plugin';
 import knexPkg, { type Knex } from 'knex';
 
 import { db } from '../lib/config.js';
-import { Users } from '../lib/db/index.js';
+import { Users, AccessKeys } from '../lib/db/index.js';
 
 const { knex } = knexPkg;
 const { APP_STAGE } = process.env;
@@ -19,6 +19,7 @@ const dbPlugin = async function (app: FastifyInstance, _: FastifyPluginOptions) 
   });
   const models = {
     Users: new Users(connect),
+    AccessKeys: new AccessKeys(connect),
   };
 
   app.decorate('knex', connect);

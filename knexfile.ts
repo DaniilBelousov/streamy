@@ -1,6 +1,6 @@
 import type { Knex } from 'knex';
-import { db } from './lib/config.js';
-import { AppStages } from './types/index.js';
+import { db } from './lib/config';
+import { AppStages } from './types/index';
 
 // remove type from package.json to successfully run migration
 
