@@ -14,6 +14,9 @@ const __dirname = dirname(filePath);
 const app = Fastify({
   logger: {
     level: 'info',
+    transport: {
+      target: 'pino-pretty',
+    },
   },
 });
 
