@@ -1,17 +1,16 @@
-import type { FastifyRequest, FastifyReply } from 'fastify';
+import type { FastifyRequest } from 'fastify';
 
-import { auth } from '../lib/config.js';
+import { auth } from './config.js';
+import { Unauthorized } from './errors.js';
 
-export const jwtAuth = async (req: FastifyRequest, res: FastifyReply) => {
+export const jwtAuth = async (req: FastifyRequest) => {
   try {
     const { whitelist } = auth;
     if (!whitelist.includes(req.url)) {
       await req.jwtVerify({ onlyCookie: true });
     }
   } catch (error) {
-    console.log('Auth Error:', error);
-    // const unauthorizedError = new Unauthorized();
-    // res.statusCode = unauthorizedError.statusCode;
-    res.send(error);
+    req.log.error('Auth Error:', error);
+    throw new Unauthorized();
   }
 };

@@ -95,8 +95,10 @@ export const handleAppError = (
   const statusCode = error.statusCode || 500;
   if (statusCode === 500) {
     const systemError = new SystemError();
+    reply.statusCode = systemError.statusCode;
     reply.send(systemError);
   } else {
+    reply.statusCode = statusCode;
     reply.send(error);
   }
 };

@@ -8,8 +8,8 @@ export default {
           id: z.string().uuid(),
           email: z.string().email(),
           nickname: z.string(),
-          createdAt: z.string().datetime(),
-          updatedAt: z.string().datetime(),
+          createdAt: z.date(),
+          updatedAt: z.date(),
         })
         .array(),
     },
