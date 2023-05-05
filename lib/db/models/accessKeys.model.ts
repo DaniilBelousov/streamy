@@ -17,9 +17,7 @@ export class AccessKeys extends CommonModel<IAccessKeys, IAccessKeys, IAccessKey
   }
 
   override async create(data: IAccessKeys): Promise<string> {
-    const parsedData = this.guard.safeParse(data);
-    const isValid = parsedData.success;
-    if (!isValid) throw new Error();
+    this.validateModel(data);
     const model = this.knex(this.tableName);
     await model.insert(data);
     return data.refreshToken;

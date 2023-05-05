@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { join, dirname } from 'node:path';
 
 import { jwtAuth } from './lib/hooks.js';
+import { handleAppError } from './lib/errors.js';
 
 const filePath = fileURLToPath(import.meta.url);
 const __dirname = dirname(filePath);
@@ -18,6 +19,7 @@ const app = Fastify({
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
+app.setErrorHandler(handleAppError);
 
 app.addHook('preParsing', jwtAuth);
 

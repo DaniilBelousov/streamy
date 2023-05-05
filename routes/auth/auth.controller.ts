@@ -3,6 +3,7 @@ import type { ZodTypeProvider } from 'fastify-type-provider-zod';
 
 import schemas from './auth.schema.js';
 import Service from './auth.service.js';
+import { Unauthorized } from '../../lib/errors.js';
 
 export default async function (app: FastifyInstance) {
   const service = new Service(app);
@@ -51,9 +52,9 @@ export default async function (app: FastifyInstance) {
     schema: schemas.refresh,
     handler: async (req, res) => {
       const refreshToken = req.cookies['refreshToken'];
-      if (!refreshToken) throw new Error();
+      if (!refreshToken) throw new Unauthorized();
       const { valid, value } = req.unsignCookie(refreshToken);
-      if (!valid || !value) throw new Error();
+      if (!valid || !value) throw new Unauthorized();
       const { accessToken, refreshToken: newRefreshToken } = await service.refresh(value);
       res.setCookie('token', accessToken, {
         path: '/',

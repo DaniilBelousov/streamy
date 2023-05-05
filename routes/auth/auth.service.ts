@@ -8,6 +8,14 @@ import { validatePassword, hashPassword } from '../../lib/utils.js';
 import { auth } from '../../lib/config.js';
 import type schemas from './auth.schema.js';
 import type { IUser } from '../../lib/db/index.js';
+import { NotFound, BadRequest } from '../../lib/errors.js';
+import {
+  ERROR_CODE_ALREADY_EXISTS,
+  ERROR_CODE_INVALID_PASSWORD,
+  ERROR_MESSAGE_USER_EXISTS,
+  ERROR_MESSAGE_USER_NOT_FOUND,
+  ERROR_MESSAGE_INVALID_PASSWORD,
+} from '../../lib/constants.js';
 
 type SignUpBody = z.infer<typeof schemas.signUp.body>;
 type SignInBody = z.infer<typeof schemas.signIn.body>;
@@ -31,7 +39,7 @@ class Service {
 
     const { password, email, nickname } = data;
     const user = await Users.read().select('*').where({ email }).first();
-    if (user) throw new Error('User already exists');
+    if (user) throw new BadRequest({ message: ERROR_MESSAGE_USER_EXISTS });
     const passwordHash = await hashPassword(password);
     const id = await Users.create({ ...data, password: passwordHash });
 
@@ -44,9 +52,19 @@ class Service {
     } = this.app;
 
     const user = await Users.read().select('*').where({ email }).first();
-    if (!user) throw new Error('User not found');
+    if (!user) {
+      throw new NotFound({
+        message: ERROR_MESSAGE_USER_NOT_FOUND,
+        code: ERROR_CODE_ALREADY_EXISTS,
+      });
+    }
     const isValid = await validatePassword(password, user.password);
-    if (!isValid) throw new Error('Invalid password');
+    if (!isValid) {
+      throw new BadRequest({
+        message: ERROR_MESSAGE_INVALID_PASSWORD,
+        code: ERROR_CODE_INVALID_PASSWORD,
+      });
+    }
     const { id, nickname } = user;
 
     return this.renewTokens({ id, nickname });

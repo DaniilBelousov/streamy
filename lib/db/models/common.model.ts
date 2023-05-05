@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import type { Knex } from 'knex';
 import type z from 'zod';
 
-class CommonModel<RData extends {}, CData, UData extends Partial<CData>> {
+class CommonModel<RData extends {}, CData extends {}, UData extends Partial<CData>> {
   public tableName: string;
   protected knex: Knex;
   protected guard: z.AnyZodObject;
@@ -15,9 +15,7 @@ class CommonModel<RData extends {}, CData, UData extends Partial<CData>> {
   }
 
   async create(data: CData): Promise<string> {
-    const parsedData = this.guard.safeParse(data);
-    const isValid = parsedData.success;
-    if (!isValid) throw new Error();
+    this.validateModel(data);
     const id = randomUUID();
     const model = this.knex(this.tableName);
     await model.insert({ id, ...data });
@@ -25,9 +23,6 @@ class CommonModel<RData extends {}, CData, UData extends Partial<CData>> {
   }
 
   async update(id: string, data: UData): Promise<string> {
-    const parsedData = this.guard.partial().safeParse(data);
-    const isValid = parsedData.success;
-    if (!isValid) throw new Error();
     const model = this.knex(this.tableName);
     await model.where({ id }).update(data);
     return id;
@@ -42,6 +37,15 @@ class CommonModel<RData extends {}, CData, UData extends Partial<CData>> {
   read<T>(): Knex.QueryBuilder<RData, T> {
     const model = this.knex<RData, T>(this.tableName);
     return model;
+  }
+
+  protected validateModel(data: CData) {
+    const parsedData = this.guard.partial().safeParse(data);
+    const isValid = parsedData.success;
+    if (!isValid) {
+      const inputFields = Object.keys(data).toString();
+      throw new Error(`[Model Guard] Invalid data provided: ${inputFields}`);
+    }
   }
 }
 
